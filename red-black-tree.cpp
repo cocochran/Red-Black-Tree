@@ -9,13 +9,6 @@ struct Node{
 };
 
 class RedBlackTree {
-    enum Color { RED, BLACK };
-    struct Node{
-        int data;
-            Color color;
-            Node *left, *right, *parent;
-            Node(int data) : data(data), color(RED), left(nullptr), right(nullptr), parent(nullptr) {}
-        };
     public:
         enum Color { RED, BLACK };
         Node *root;
