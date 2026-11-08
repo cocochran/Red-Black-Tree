@@ -1,16 +1,7 @@
-enum Color { RED, BLACK };
-
-struct Node{
-    int data;
-    Color color;
-    Node *left, *right, *parent;
-    Node(int data) : data(data), color(RED), left(nullptr), right(nullptr), parent(nullptr) {}
-    Node(int data, Color color) : data(data), color(color), left(nullptr), right(nullptr), parent(nullptr) {}
-};
+#include "red-black-tree.hpp"
 
 class RedBlackTree {
     public:
-        enum Color { RED, BLACK };
         Node *root;
         RedBlackTree();
         RedBlackTree(const RedBlackTree &copy);
@@ -18,11 +9,10 @@ class RedBlackTree {
         void insert(int data);
         void remove(int data);
         void inorder();
-        int* find(int data);
-        int* find(Node* root, int data);
+        Node* find(int data);
+        Node* find(Node* root, int data);
         void deinitialize();
 };
-
 
 RedBlackTree::RedBlackTree(const RedBlackTree &copy) {
     // Implementation of copy constructor
@@ -51,15 +41,18 @@ Node* RedBlackTree::find(Node* root, int data) {
     }
 
     if (data == current->data) {
-        return *current; // Node found, return pointer to data
+        return current; // Node found, return pointer to data
     } else if (data < current->data) {
         return find(current->left, data); // Search in the left subtree
     } else {
         return find(current->right, data); // Search in the right subtree
     }
-
-    return nullptr; // Placeholder return
 }
+
+Node* RedBlackTree::find(int data){
+        return find(this->root, data);
+}
+
 void RedBlackTree::deinitialize() {
     // Implementation of deinitialization
     //For each node, delete the node and set its pointer to nullptr, freeing up memory and preventing memory leaks.

@@ -12,7 +12,7 @@ struct Node{
 };
 
 class RedBlackTree {
-    public:
+public:
         Node *root;
         RedBlackTree();
         RedBlackTree(const RedBlackTree &copy);
@@ -20,6 +20,8 @@ class RedBlackTree {
         void insert(int data);
         void remove(int data);
         void inorder();
+        int* find(int data);
+        int* find(Node* root, int data);
         void deinitialize();
 };
 #endif
