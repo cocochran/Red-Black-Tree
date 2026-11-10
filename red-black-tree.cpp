@@ -1,41 +1,36 @@
 #include "red-black-tree.hpp"
 
-class RedBlackTree {
-    public:
-        Node *root;
-        RedBlackTree();
-        RedBlackTree(const RedBlackTree &copy);
-        RedBlackTree(Node *root);
-        void insert(int data);
-        void remove(int data);
-        void inorder();
-        Node* find(int data);
-        Node* find(Node* root, int data);
-        void deinitialize();
-};
-
+template<typename T>
 RedBlackTree::RedBlackTree(const RedBlackTree &copy) {
     // Implementation of copy constructor
 }
 
-RedBlackTree::RedBlackTree(Node *root) {
+template<typename T>
+RedBlackTree::RedBlackTree(Node<T> *root) {
     // Implementation of constructor with root node
 }
 
-void RedBlackTree::insert(int data) {
+template<typename T>
+void RedBlackTree<T>::insert(int data) {
     // Implementation of insert function
 }
 
-void RedBlackTree::remove(int data) {
-    // Implementation of remove function
-}
+template<typename T>
+void RedBlackTree::insert(Node* node);
 
-void RedBlackTree::inorder() {
+void RedBlackTree<T>::remove(int data);
+
+template<typename T>
+void RedBlackTree<T>::remove(Node* node);
+
+template<typename T>
+void RedBlackTree<T>::inorder() {
     // Implementation of inorder traversal
 }
 
-Node* RedBlackTree::find(Node* root, int data) {
-    Node* current = root;
+template<typename T>
+Node<T>* RedBlackTree<T>::find(Node<T>* root, int data) {
+    Node* current = root;/ Implementation of remove function
     if (current == nullptr) {
         return nullptr; // Base case: node not found
     }
@@ -49,11 +44,38 @@ Node* RedBlackTree::find(Node* root, int data) {
     }
 }
 
-Node* RedBlackTree::find(int data){
+template<typename T>
+Node* RedBlackTree<T>::find(int data){
         return find(this->root, data);
 }
 
-void RedBlackTree::deinitialize() {
+template<typename T>
+void RedBlackTree<T>::deinitialize() {
     // Implementation of deinitialization
     //For each node, delete the node and set its pointer to nullptr, freeing up memory and preventing memory leaks.
+    
+}
+
+template<typename T>
+void RedBlackTree<T>::leftRotate(Node *&root, Node *&x) {
+
+}
+
+template<typename T>
+void RedBlackTree::rightRotate(Node *&root, Node *&x) {
+    if (x == nullptr){
+        return;
+    }
+
+    if (x->left == nullptr && pt->right == nullptr){
+        return;
+    }
+
+    Node *y = x->right;
+    x->left = y->right;
+    y->right = x;
+    if (x->parent == nullptr){
+
+    }
+    x->parent = y;
 }
