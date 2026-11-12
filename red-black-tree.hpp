@@ -18,7 +18,7 @@ struct Node{
 template<typename T>
 class RedBlackTree {
     public:
-        Node<T> *root;
+        Node<T>* root;
         RedBlackTree();
         RedBlackTree(const RedBlackTree&);
         RedBlackTree(Node<T>*);
@@ -42,8 +42,10 @@ class RedBlackTree {
         void leftRotate(Node<T>*&, Node<T>*&);
         int findHeight();
         void rightRotate(Node<T>*&, Node<T>*&);
-        void fixViolation(Node<T>*&, Node<T>*&);
+        void fixViolation(Node* root, Node* node);
         Node<T>* find(Node<T>*, T);
+        void insert(Node<T>* root, Node<T>* node);
+        void remove(Node<T>* root, Node<T>* node);
         void inorder(Node<T>*, std::vector<T>&) const;
 
 };
@@ -66,25 +68,54 @@ template<typename T>
 int RedBlackTree<T>::size(){ return this->numberOfNodes; }
 
 /* -------- INSERT FUNCTIONS --------*/
+
+template<typename T>
+void RedBlackTree<T>::insert(Node<T>* root, Node<T>* node){
+    Node* current = root;
+    if (current == nullptr) {
+        current = node;
+        return;
+    }
+    if (root->data >= node->data) current = node->left;
+    else current = node->right;
+    insert(current, node);
+    fixViolation(root, node);
+}
+
 template<typename T>
 void RedBlackTree<T>::insert(T data) {
-    // Implementation of insert function
+    Node node = Node(data);
+    insert(node);
+    size++;
 }
 template<typename T>
 void RedBlackTree<T>::insert(Node<T>* node){
-
+    insert(root, node);
+    numberOfNodes++;
+    heightOfTree = findHeight();
 }
 
 
+
 /* -------- REMOVE FUNCTIONS --------*/
+
+template<typename T>
+void RedBlackTree<T>::remove(Node<T>* root, Node<T>* node){
+    //needs implementation
+    fixViolation(root, node);
+}
+
 template<typename T>
 void RedBlackTree<T>::remove(T data){
-
+    Node<T>* node = find(data);
+    remove(node);
 }
 
 template<typename T>
 void RedBlackTree<T>::remove(Node<T>* node){
-
+    remove(root, node);
+    numberOfNodes--;
+    heightOfTree = findHeight();
 }
 
 
