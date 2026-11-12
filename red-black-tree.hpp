@@ -22,6 +22,7 @@ class RedBlackTree {
         RedBlackTree();
         RedBlackTree(const RedBlackTree&);
         RedBlackTree(Node<T>*);
+        RedBlackTree(T);
         int size();
         int height();
 
@@ -51,27 +52,52 @@ class RedBlackTree {
 };
 
 /* -------- CONSTRUCTORS --------*/
+
+/*
+    Empty constructor.
+*/
 template<typename T>
 RedBlackTree<T>::RedBlackTree() : root(nullptr), numberOfNodes(0), heightOfTree(0) {}
 
+/*
+    Copy constructor.
+*/
 template<typename T>
 RedBlackTree<T>::RedBlackTree(const RedBlackTree<T> &copy) {
     // Implementation of copy constructor
 }
+
+/*
+    Constructor, inserting just the root.using pointer.
+*/
 template<typename T>
-RedBlackTree<T>::RedBlackTree(Node<T> *root) {
-    // Implementation of constructor with root node
+RedBlackTree<T>::RedBlackTree(Node<T> *r) : root(nullptr), numberOfNodes(0), heightOfTree(0) {
+    root = r;
+}
+
+/*
+    Constructor, inserting just the root.using provided node data.
+*/
+template<typename T>
+RedBlackTree<T>::RedBlackTree(T data) : root(nullptr), numberOfNodes(0), heightOfTree(0) {
+    
 }
 
 /* -------- SIZE FUNCTION --------*/
+/*
+    Returns the number of nodes in the tree.
+*/
 template<typename T>
 int RedBlackTree<T>::size(){ return this->numberOfNodes; }
 
 /* -------- INSERT FUNCTIONS --------*/
 
+/*
+    Helper function to insert a node into the table.
+*/
 template<typename T>
 void RedBlackTree<T>::insert(Node<T>* root, Node<T>* node){
-    Node* current = root;
+    Node<T>* current = root;
     if (current == nullptr) {
         current = node;
         return;
@@ -82,12 +108,9 @@ void RedBlackTree<T>::insert(Node<T>* root, Node<T>* node){
     fixViolation(root, node);
 }
 
-template<typename T>
-void RedBlackTree<T>::insert(T data) {
-    Node node = Node(data);
-    insert(node);
-    size++;
-}
+/*
+    Uses helper function to insert an already created node with a particular address.
+*/
 template<typename T>
 void RedBlackTree<T>::insert(Node<T>* node){
     insert(root, node);
@@ -95,22 +118,34 @@ void RedBlackTree<T>::insert(Node<T>* node){
     heightOfTree = findHeight();
 }
 
+/*
+    Uses insert(Node<T>*) in order to insert a node into the tree given only data content.
+*/
+template<typename T>
+void RedBlackTree<T>::insert(T data) {
+    Node node = Node(data);
+    insert(node);
+    size++;
+}
+
 
 
 /* -------- REMOVE FUNCTIONS --------*/
 
+/*
+    Helper function to remove and delete a node.
+    Node-to-delete's address must be the address of the node in the tree.
+*/
 template<typename T>
 void RedBlackTree<T>::remove(Node<T>* root, Node<T>* node){
     //needs implementation
     fixViolation(root, node);
+    delete node;
 }
 
-template<typename T>
-void RedBlackTree<T>::remove(T data){
-    Node<T>* node = find(data);
-    remove(node);
-}
-
+/*
+    Uses helper function to delete node with particular address.
+*/
 template<typename T>
 void RedBlackTree<T>::remove(Node<T>* node){
     remove(root, node);
@@ -118,8 +153,22 @@ void RedBlackTree<T>::remove(Node<T>* node){
     heightOfTree = findHeight();
 }
 
+/*
+    Uses remove(Node<T>*) in order to delete node from tree given only its data content.
+*/
+template<typename T>
+void RedBlackTree<T>::remove(T data){
+    Node<T>* node = find(data);
+    remove(node);
+}
+
+
 
 /* -------- ARRAY FUNCTION --------*/
+
+/*
+    Returns a vector with the data of each node in the tree in ascending order.
+*/
 template<typename T>
 std::vector<T> RedBlackTree<T>::getVector(){
     std::vector<T> result;
@@ -127,6 +176,9 @@ std::vector<T> RedBlackTree<T>::getVector(){
     return result; // elements in sorted order
 }
 
+/*
+    Helper function to get a vector with all node data in order.
+*/
 template<typename T>
 void RedBlackTree<T>::inorder(Node<T>* node, std::vector<T>& out) const {
     if (node == nullptr) return;
@@ -137,6 +189,10 @@ void RedBlackTree<T>::inorder(Node<T>* node, std::vector<T>& out) const {
 
 
 /* -------- FIND FUNCTIONS --------*/
+
+/*
+    Helper function to do a traditional binary search.
+*/
 template<typename T>
 Node<T>* RedBlackTree<T>::find(Node<T>* root, T data) {
     Node<T>* current = root;
@@ -153,6 +209,10 @@ Node<T>* RedBlackTree<T>::find(Node<T>* root, T data) {
     }
 }
 
+/*
+    Utilize the helper to find the node's address.
+    If node is not in tree, return nullptr.
+*/
 template<typename T>
 Node<T>* RedBlackTree<T>::find(T data){
         return find(this->root, data);
@@ -160,10 +220,13 @@ Node<T>* RedBlackTree<T>::find(T data){
 
 
 /* -------- DEINITIALIZE FUNCTION --------*/
+/*
+    Deinitializes the tree, frees up memory previously utilized by the nodes.
+    No nodes will be able to be accessed after deinitialization.
+*/
 template<typename T>
 void RedBlackTree<T>::deinitialize() {
-    // Implementation of deinitialization
-    //For each node, delete the node and set its pointer to nullptr, freeing up memory and preventing memory leaks.
+    
 }
 
 
