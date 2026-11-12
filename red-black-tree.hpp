@@ -38,16 +38,18 @@ class RedBlackTree {
         
     private:
         int numberOfNodes;
-        int heightOfTree;
 
         void leftRotate(Node<T>*&, Node<T>*&);
-        int findHeight();
         void rightRotate(Node<T>*&, Node<T>*&);
         void fixViolation(Node* root, Node* node);
         Node<T>* find(Node<T>*, T);
         void insert(Node<T>* root, Node<T>* node);
         void remove(Node<T>* root, Node<T>* node);
         void inorder(Node<T>*, std::vector<T>&) const;
+
+        static Node<T>* copySubtree(const Node<T>*, Node<T>*);
+        static int countNodes(const Node<T>*);
+        static int subtreeHeight(const Node<T>*);
 
 };
 
@@ -60,35 +62,81 @@ template<typename T>
 RedBlackTree<T>::RedBlackTree() : root(nullptr), numberOfNodes(0), heightOfTree(0) {}
 
 /*
-    Copy constructor.
+    Copy constructor. Performs a deep copy so the two trees share no nodes.
 */
 template<typename T>
-RedBlackTree<T>::RedBlackTree(const RedBlackTree<T> &copy) {
-    // Implementation of copy constructor
+RedBlackTree<T>::RedBlackTree(const RedBlackTree<T> &copy)
+    : root(copySubtree(copy.root, nullptr)),
+      numberOfNodes(copy.numberOfNodes),
+      heightOfTree(copy.heightOfTree) {}
+
+/*
+    Constructor, using an existing node as the root.
+    The root is recolored black, as required by red-black tree rules.
+*/
+template<typename T>
+RedBlackTree<T>::RedBlackTree(Node<T> *r) : root(r), numberOfNodes(0), heightOfTree(0) {
+    if (root == nullptr) return;
+    root->parent = nullptr;
+    root->color = BLACK;
+    numberOfNodes = countNodes(root);
+    heightOfTree = subtreeHeight(root);
 }
 
 /*
-    Constructor, inserting just the root.using pointer.
+    Constructor, creating a black root node from the provided data.
 */
 template<typename T>
-RedBlackTree<T>::RedBlackTree(Node<T> *r) : root(nullptr), numberOfNodes(0), heightOfTree(0) {
-    root = r;
+RedBlackTree<T>::RedBlackTree(T data)
+    : root(new Node<T>(data, BLACK)), numberOfNodes(1), heightOfTree(1) {}
+
+/* -------- CONSTRUCTOR HELPERS --------*/
+
+/*
+    Recursively deep-copies a subtree, preserving colors and wiring parent pointers.
+*/
+template<typename T>
+Node<T>* RedBlackTree<T>::copySubtree(const Node<T>* source, Node<T>* parent) {
+    if (source == nullptr) return nullptr;
+    Node<T>* node = new Node<T>(source->data, source->color);
+    node->parent = parent;
+    node->left = copySubtree(source->left, node);
+    node->right = copySubtree(source->right, node);
+    return node;
 }
 
 /*
-    Constructor, inserting just the root.using provided node data.
+    Counts the nodes in a subtree.
 */
 template<typename T>
-RedBlackTree<T>::RedBlackTree(T data) : root(nullptr), numberOfNodes(0), heightOfTree(0) {
-    
+int RedBlackTree<T>::countNodes(const Node<T>* node) {
+    if (node == nullptr) return 0;
+    return 1 + countNodes(node->left) + countNodes(node->right);
 }
 
-/* -------- SIZE FUNCTION --------*/
+/*
+    Height of a subtree, counted in nodes (empty = 0, single node = 1).
+*/
+template<typename T>
+int RedBlackTree<T>::subtreeHeight(const Node<T>* node) {
+    if (node == nullptr) return 0;
+    int leftSubtreeHeight = subtreeHeight(node->left);
+    int rightSubtreeHeight = subtreeHeight(node->right);
+    return 1 + (leftSubtreeHeight > rightSubtreeHeight ? leftSubtreeHeight : rightSubtreeHeight);
+}
+
+/* -------- SIZE FUNCTIONS --------*/
 /*
     Returns the number of nodes in the tree.
 */
 template<typename T>
 int RedBlackTree<T>::size(){ return this->numberOfNodes; }
+
+template<typename T>
+int RedBlackTree<T>::height() {
+    if (node == nullptr) return 0;
+    return subtreeHeight(root);
+}
 
 /* -------- INSERT FUNCTIONS --------*/
 
@@ -115,7 +163,6 @@ template<typename T>
 void RedBlackTree<T>::insert(Node<T>* node){
     insert(root, node);
     numberOfNodes++;
-    heightOfTree = findHeight();
 }
 
 /*
@@ -150,7 +197,6 @@ template<typename T>
 void RedBlackTree<T>::remove(Node<T>* node){
     remove(root, node);
     numberOfNodes--;
-    heightOfTree = findHeight();
 }
 
 /*
