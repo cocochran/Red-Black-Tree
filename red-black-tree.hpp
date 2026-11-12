@@ -23,6 +23,7 @@ class RedBlackTree {
         RedBlackTree(const RedBlackTree&);
         RedBlackTree(Node<T>*);
         RedBlackTree(T);
+        ~RedBlackTree();
         int size();
         int height();
 
@@ -89,6 +90,14 @@ RedBlackTree<T>::RedBlackTree(Node<T> *r) : root(r), numberOfNodes(0), heightOfT
 template<typename T>
 RedBlackTree<T>::RedBlackTree(T data)
     : root(new Node<T>(data, BLACK)), numberOfNodes(1), heightOfTree(1) {}
+
+/* -------- DESTRUCTOR --------*/
+
+/*
+    Destructor. Frees every node in the tree via deinitialize().
+*/
+template<typename T>
+RedBlackTree<T>::~RedBlackTree() { deinitialize(); }
 
 /* -------- CONSTRUCTOR HELPERS --------*/
 
@@ -272,7 +281,19 @@ Node<T>* RedBlackTree<T>::find(T data){
 */
 template<typename T>
 void RedBlackTree<T>::deinitialize() {
-    
+    // Remove every node except the root. Rotations during removal can change
+    // which node is the root, so re-check the current root on each pass
+    // instead of iterating over a snapshot of the nodes.
+    while (root != nullptr && (root->left != nullptr || root->right != nullptr)) {
+        Node<T>* child = (root->left != nullptr) ? root->left : root->right;
+        remove(child);
+    }
+
+    // Only the root is left; free it directly.
+    delete root;
+    root = nullptr;
+    numberOfNodes = 0;
+    heightOfTree = 0;
 }
 
 
