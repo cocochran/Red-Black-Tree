@@ -41,12 +41,12 @@ class RedBlackTree {
 
         void leftRotate(Node<T>*&, Node<T>*&);
         void rightRotate(Node<T>*&, Node<T>*&);
-        void fixViolation(Node* root, Node* node);
+        void fixViolation(Node*, Node*);
         Node<T>* find(Node<T>*, T);
-        void insert(Node<T>* root, Node<T>* node);
-        void remove(Node<T>*& root, Node<T>* node);
-        void transplant(Node<T>*& root, Node<T>* oldNode, Node<T>* newNode);
-        void removeFixup(Node<T>*& root, Node<T>* x, Node<T>* xParent);
+        void insert(Node<T>*, Node<T>*);
+        void remove(Node<T>*, Node<T>*);
+        void transplant(Node<T>*&, Node<T>*, Node<T>*);
+        void removeFixup(Node<T>*&, Node<T>*, Node<T>*);
         void inorder(Node<T>*, std::vector<T>&) const;
 
         static Node<T>* copySubtree(const Node<T>*, Node<T>*);
