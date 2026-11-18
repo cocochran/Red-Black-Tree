@@ -44,10 +44,11 @@ class RedBlackTree {
         void fixViolation(Node*, Node*);
         Node<T>* find(Node<T>*, T);
         void insert(Node<T>*, Node<T>*);
-        void remove(Node<T>*, Node<T>*);
+        void remove(Node<T>*, Node<T>*&);
         void transplant(Node<T>*&, Node<T>*, Node<T>*);
         void removeFixup(Node<T>*&, Node<T>*, Node<T>*);
         void inorder(Node<T>*, std::vector<T>&) const;
+        Node<T>* getSuccessor(Node<T>*)
 
         static Node<T>* copySubtree(const Node<T>*, Node<T>*);
         static int countNodes(const Node<T>*);
@@ -102,7 +103,7 @@ RedBlackTree<T>::RedBlackTree(T data)
 template<typename T>
 RedBlackTree<T>::~RedBlackTree() { deinitialize(); }
 
-/* -------- CONSTRUCTOR HELPERS --------*/
+/* -------- MISC. HELPERS --------*/
 
 /*
     Recursively deep-copies a subtree, preserving colors and wiring parent pointers.
@@ -135,6 +136,15 @@ int RedBlackTree<T>::subtreeHeight(const Node<T>* node) {
     int leftSubtreeHeight = subtreeHeight(node->left);
     int rightSubtreeHeight = subtreeHeight(node->right);
     return 1 + (leftSubtreeHeight > rightSubtreeHeight ? leftSubtreeHeight : rightSubtreeHeight);
+}
+
+template<typename T>
+Node<T>* RedBlackTree<T>::getSuccessor(Node<T>* curr){
+    curr = curr->right;
+    while (curr != nullptr && curr->left != nullptr){
+        curr = curr->left;
+    }
+    return curr;
 }
 
 /* -------- SIZE FUNCTIONS --------*/
@@ -196,69 +206,103 @@ void RedBlackTree<T>::insert(T data) {
     Node-to-delete's address must be the address of the node in the tree.
 */
 template<typename T>
-void RedBlackTree<T>::remove(Node<T>* root, Node<T>* node){
+void RedBlackTree<T>::remove(Node<T>* root, Node<T>*& node){
+    if (node == nullptr) return;
+
     Color nodeColor = node->color;
-    
+    Node<T>* x = nullptr;        // node that moves into the removed spot (may be nullptr)
+    Node<T>* xParent = nullptr;  // x's parent, tracked separately since x may be nullptr
+
     // Node has no children
     if (node->left == nullptr && node->right == nullptr){
-        node = nullptr
-        delete node;
-        return
+        xParent = node->parent;
+        if (this->root == node){
+            this->root = nullptr;
+        }
+        //Node is a left child
+        else if (node == node->parent->left){
+            node->parent->left = nullptr;
+        }
+        //Node is a right child
+        else {
+            node->parent->right = nullptr;
+        }
     }
 
     // Node has one child
     else if ((node->right != nullptr) != (node->left != nullptr)){
         if (node->left != nullptr){
-            if (root == node){
-                node->left = root;
-                root.parent = nullptr;
-                delete node;
-                return;
+            if (this->root == node){
+                this->root = node->left;
             }
-
-            //Parent is to the right
-            if (node->data > node->parent->data){
+            //Node is a left child
+            else if (node == node->parent->left){
                 node->parent->left = node->left;
-            } 
-            //Parent is to the left
+            }
+            //Node is a right child
             else {
                 node->parent->right = node->left;
             }
 
             node->left->parent = node->parent;
-
+            x = node->left;
 
         } else {
-            if (root == node){
-                node->right = root;
-                root.parent = nullptr;
-                delete node;
-                return;
+            if (this->root == node){
+                this->root = node->right;
             }
-
-            //Parent is to the right
-            if (node->data > node->parent->data){
+            //Node is a left child
+            else if (node == node->parent->left){
                 node->parent->left = node->right;
-            } 
-            //Parent is to the left
+            }
+            //Node is a right child
             else {
                 node->parent->right = node->right;
             }
 
-            node->left->parent = node->parent;
+            node->right->parent = node->parent;
+            x = node->right;
         }
 
-        delete node;
-        return;
-    } 
+        xParent = node->parent;
+    }
 
     // Node has two children
     else{
+        Node<T>* successor = getSuccessor(node);
+        nodeColor = successor->color;   // successor is the node that actually leaves its spot
+        x = successor->right;           // successor never has a left child
 
+        // Detach successor from its old spot (unless it's node's direct right child)
+        if (successor->parent == node){
+            xParent = successor;
+        } else {
+            xParent = successor->parent;
+            successor->parent->left = successor->right;
+            if (successor->right != nullptr) successor->right->parent = successor->parent;
+            successor->right = node->right;
+            successor->right->parent = successor;
+        }
+
+        // Put successor in node's spot
+        successor->parent = node->parent;
+        if (this->root == node){
+            this->root = successor;
+        } else if (node == node->parent->left){
+            node->parent->left = successor;
+        } else {
+            node->parent->right = successor;
+        }
+
+        successor->left = node->left;
+        successor->left->parent = successor;
+        successor->color = node->color;
     }
 
-    fixViolation(root, node);
     delete node;
+    node = nullptr;
+
+    if (nodeColor == BLACK) removeFixup(this->root, x, xParent);
 }
 
 /*
