@@ -35,7 +35,6 @@ class RedBlackTree {
 
         std::vector<T> getVector();
         Node<T>* find(T);
-        void deinitialize();
         
     private:
         int numberOfNodes;
@@ -45,12 +44,16 @@ class RedBlackTree {
         void fixViolation(Node* root, Node* node);
         Node<T>* find(Node<T>*, T);
         void insert(Node<T>* root, Node<T>* node);
-        void remove(Node<T>* root, Node<T>* node);
+        void remove(Node<T>*& root, Node<T>* node);
+        void transplant(Node<T>*& root, Node<T>* oldNode, Node<T>* newNode);
+        void removeFixup(Node<T>*& root, Node<T>* x, Node<T>* xParent);
         void inorder(Node<T>*, std::vector<T>&) const;
 
         static Node<T>* copySubtree(const Node<T>*, Node<T>*);
         static int countNodes(const Node<T>*);
         static int subtreeHeight(const Node<T>*);
+        void deinitialize();
+
 
 };
 
@@ -194,7 +197,66 @@ void RedBlackTree<T>::insert(T data) {
 */
 template<typename T>
 void RedBlackTree<T>::remove(Node<T>* root, Node<T>* node){
-    //needs implementation
+    Color nodeColor = node->color;
+    
+    // Node has no children
+    if (node->left == nullptr && node->right == nullptr){
+        node = nullptr
+        delete node;
+        return
+    }
+
+    // Node has one child
+    else if ((node->right != nullptr) != (node->left != nullptr)){
+        if (node->left != nullptr){
+            if (root == node){
+                node->left = root;
+                root.parent = nullptr;
+                delete node;
+                return;
+            }
+
+            //Parent is to the right
+            if (node->data > node->parent->data){
+                node->parent->left = node->left;
+            } 
+            //Parent is to the left
+            else {
+                node->parent->right = node->left;
+            }
+
+            node->left->parent = node->parent;
+
+
+        } else {
+            if (root == node){
+                node->right = root;
+                root.parent = nullptr;
+                delete node;
+                return;
+            }
+
+            //Parent is to the right
+            if (node->data > node->parent->data){
+                node->parent->left = node->right;
+            } 
+            //Parent is to the left
+            else {
+                node->parent->right = node->right;
+            }
+
+            node->left->parent = node->parent;
+        }
+
+        delete node;
+        return;
+    } 
+
+    // Node has two children
+    else{
+
+    }
+
     fixViolation(root, node);
     delete node;
 }
