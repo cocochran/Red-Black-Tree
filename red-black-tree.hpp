@@ -41,21 +41,21 @@ class RedBlackTree {
 
         void leftRotate(Node<T>*&, Node<T>*&);
         void rightRotate(Node<T>*&, Node<T>*&);
-        void fixViolation(Node*, Node*);
         Node<T>* find(Node<T>*, T);
         void insert(Node<T>*, Node<T>*);
         void remove(Node<T>*, Node<T>*&);
         void transplant(Node<T>*&, Node<T>*, Node<T>*);
+        void insertFixup(Node<T>*, Node<T>*);
         void removeFixup(Node<T>*&, Node<T>*, Node<T>*);
         void inorder(Node<T>*, std::vector<T>&) const;
-        Node<T>* getSuccessor(Node<T>*)
+        Node<T>* getSuccessor(Node<T>*);
 
         static Node<T>* copySubtree(const Node<T>*, Node<T>*);
         static int countNodes(const Node<T>*);
         static int subtreeHeight(const Node<T>*);
         void deinitialize();
 
-
+iolation
 };
 
 /* -------- CONSTRUCTORS --------*/
@@ -64,7 +64,7 @@ class RedBlackTree {
     Empty constructor.
 */
 template<typename T>
-RedBlackTree<T>::RedBlackTree() : root(nullptr), numberOfNodes(0), heightOfTree(0) {}
+RedBlackTree<T>::RedBlackTree() : root(nullptr), numberOfNodes(0) {}
 
 /*
     Copy constructor. Performs a deep copy so the two trees share no nodes.
@@ -73,19 +73,17 @@ template<typename T>
 RedBlackTree<T>::RedBlackTree(const RedBlackTree<T> &copy)
     : root(copySubtree(copy.root, nullptr)),
       numberOfNodes(copy.numberOfNodes),
-      heightOfTree(copy.heightOfTree) {}
 
 /*
     Constructor, using an existing node as the root.
     The root is recolored black, as required by red-black tree rules.
 */
 template<typename T>
-RedBlackTree<T>::RedBlackTree(Node<T> *r) : root(r), numberOfNodes(0), heightOfTree(0) {
+RedBlackTree<T>::RedBlackTree(Node<T> *r) : root(r), numberOfNodes(0) {
     if (root == nullptr) return;
     root->parent = nullptr;
     root->color = BLACK;
     numberOfNodes = countNodes(root);
-    heightOfTree = subtreeHeight(root);
 }
 
 /*
@@ -93,7 +91,7 @@ RedBlackTree<T>::RedBlackTree(Node<T> *r) : root(r), numberOfNodes(0), heightOfT
 */
 template<typename T>
 RedBlackTree<T>::RedBlackTree(T data)
-    : root(new Node<T>(data, BLACK)), numberOfNodes(1), heightOfTree(1) {}
+    : root(new Node<T>(data, BLACK)), numberOfNodes(1) {}
 
 /* -------- DESTRUCTOR --------*/
 
@@ -156,8 +154,8 @@ int RedBlackTree<T>::size(){ return this->numberOfNodes; }
 
 template<typename T>
 int RedBlackTree<T>::height() {
-    if (node == nullptr) return 0;
-    return subtreeHeight(root);
+    if (this->root == nullptr) return 0;
+    return subtreeHeight(this->root);
 }
 
 /* -------- INSERT FUNCTIONS --------*/
@@ -194,7 +192,7 @@ template<typename T>
 void RedBlackTree<T>::insert(T data) {
     Node node = Node(data);
     insert(node);
-    size++;
+    numberOfNodes++;
 }
 
 
@@ -202,7 +200,6 @@ void RedBlackTree<T>::insert(T data) {
 /* -------- REMOVE FUNCTIONS --------*/
 
 /*
-    Helper function to remove and delete a node.
     Node-to-delete's address must be the address of the node in the tree.
 */
 template<typename T>
@@ -398,8 +395,6 @@ void RedBlackTree<T>::deinitialize() {
     // Only the root is left; free it directly.
     delete root;
     root = nullptr;
-    numberOfNodes = 0;
-    heightOfTree = 0;
 }
 
 
