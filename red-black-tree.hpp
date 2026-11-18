@@ -160,6 +160,30 @@ int RedBlackTree<T>::height() {
 
 /* -------- INSERT FUNCTIONS --------*/
 
+template<typename T>
+void RedBlackTree<T>::insertFixup(Node<T>* root, Node<T>* node){
+    //Parent of node is definitely RED.
+    Node* uncle;
+
+    if (node->parent->parent->right == node->parent) uncle = node->-parent->parent->left;
+    else uncle = node->parent-parent->right;
+
+    if (uncle->color == RED) {
+        uncle->color = BLACK;
+        node->parent = BLACK;
+        node->parent->parent = RED;
+    } else {
+        // if node is right child
+        if (node == node->parent->right){
+            leftRotate(this->root*, node->parent*);
+        } 
+        // if node is left child
+        else {
+            rightRotate(this->root*, node->parent->parent*);
+            node->parent->parent->color = RED;
+        }
+    }
+}
 /*
     Helper function to insert a node into the table.
 */
@@ -173,7 +197,7 @@ void RedBlackTree<T>::insert(Node<T>* root, Node<T>* node){
     if (root->data >= node->data) current = node->left;
     else current = node->right;
     insert(current, node);
-    fixViolation(root, node);
+    if (node->parent == RED) insertFixup(root, node);
 }
 
 /*
