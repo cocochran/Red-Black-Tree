@@ -54,8 +54,6 @@ class RedBlackTree {
         static int countNodes(const Node<T>*);
         static int subtreeHeight(const Node<T>*);
         void deinitialize();
-
-iolation
 };
 
 /* -------- CONSTRUCTORS --------*/
@@ -167,11 +165,11 @@ void RedBlackTree<T>::insertFixup(Node<T>* root, Node<T>* node){
 
     if (node->parent->parent->right == node->parent) uncle = node->-parent->parent->left;
     else uncle = node->parent-parent->right;
-
+    
     if (uncle->color == RED) {
         uncle->color = BLACK;
-        node->parent = BLACK;
-        node->parent->parent = RED;
+        node->parent->color = BLACK;
+        node->parent->parent->color = RED;
     } else {
         // if node is right child
         if (node == node->parent->right){
@@ -183,6 +181,7 @@ void RedBlackTree<T>::insertFixup(Node<T>* root, Node<T>* node){
             node->parent->parent->color = RED;
         }
     }
+    root->color = BLACK;
 }
 /*
     Helper function to insert a node into the table.
